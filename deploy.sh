@@ -92,6 +92,7 @@ services:
       - /data:/data
     ports:
       - 9000:9000
+    command: server /data
 EOF
 
 chown ubuntu. -R /home/ubuntu

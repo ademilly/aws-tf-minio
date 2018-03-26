@@ -20,6 +20,7 @@ resource aws_instance minio {
   key_name               = "${var.key_name}"
   vpc_security_group_ids = ["${var.security_group_ids}"]
   subnet_id              = "${var.aws_subnet_id}"
+  iam_instance_profile   = "${var.iam_instance_profile}"
 
   root_block_device {
     delete_on_termination = true

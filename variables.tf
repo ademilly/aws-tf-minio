@@ -37,6 +37,11 @@ variable instance_type {
   default     = "t2.nano"
 }
 
+variable iam_instance_profile {
+  description = "EC2 IAM instance profile name"
+  default     = ""
+}
+
 # Security group block
 variable security_group_ids {
   type        = "list"

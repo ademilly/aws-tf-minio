@@ -1,6 +1,8 @@
 #!/bin/bash
 apt-get -y update
-apt-get -y install htop curl nginx letsencrypt
+apt-get -y install htop curl nginx letsencrypt inotify-tools python-pip
+
+pip install awscli
 
 systemctl stop nginx
 
@@ -95,5 +97,36 @@ services:
     command: server /data
 EOF
 
+cat > /usr/local/bin/s3-minio-sync <<EOF
+#!/bin/sh
+
+inotifywait -q -e modify,move,create,delete -m --format '%w %e %f' -r /data | \
+while read directory event file; do
+  echo "\$${directory} \$${event} \$(date) \$${file}"
+  #echo "should sync \$${directory}\$${file} to s3://${bucket}/\$${directory#/data/}\$${file}"
+  aws s3 sync \$${directory} s3://${bucket}/\$${directory#/data/}
+done
+EOF
+chmod +x /usr/local/bin/s3-minio-sync
+
+cat > /etc/systemd/system/s3sync.service <<EOF
+[Unit]
+Description=S3 - Minio synchronization
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/tmp
+Environment=PATH=/bin:/usr/bin:/usr/local/bin:/home/ubuntu/.local/bin
+ExecStart=/usr/local/bin/s3-minio-sync
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+service s3sync restart
+
 chown ubuntu. -R /home/ubuntu
-su -c "cd /home/ubuntu && docker-compose up -d" ubuntu
+# su -c "cd /home/ubuntu && docker-compose up -d" ubuntu

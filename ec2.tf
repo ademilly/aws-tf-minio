@@ -40,5 +40,6 @@ data template_file user_data {
   vars {
     domain = "${var.subdomain}.${var.domain}"
     email  = "${var.email}"
+    bucket = "${var.bucket}"
   }
 }

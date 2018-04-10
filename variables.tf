@@ -52,3 +52,8 @@ variable security_group_ids {
 variable zone_id {
   description = "Route 53 zone ID"
 }
+
+# S3 block
+variable bucket {
+  description = "S3 bucket with which to synchronize"
+}
